@@ -1,6 +1,6 @@
 param(
-    [string]$MetricsJson = "$PSScriptRoot\artifacts\training\metrics.json",
-    [string]$DashboardJson = "$PSScriptRoot\artifacts\training\dashboard.json"
+    [string]$MetricsJson = "$PSScriptRoot\coveragepy_metrics.json",
+    [string]$DashboardJson = "$PSScriptRoot\dashboard_metrics.json"
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,7 +19,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "SUCCESS: All metrics are 100/100 PASS" -ForegroundColor Green
-Write-Host "Submit these files to the testing platform:"
-Write-Host "  coverage input : artifacts\training\coverage.json"
-Write-Host "  metrics output : artifacts\training\metrics.json"
-Write-Host "  dashboard view : artifacts\training\dashboard.json"
+Write-Host "Submit these ROOT files to the testing platform:"
+Write-Host "  coverage input  : coverage.json"
+Write-Host "  dashboard scores: platform_metrics.json"
+Write-Host "  full metrics    : coveragepy_metrics.json"

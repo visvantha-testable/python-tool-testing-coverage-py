@@ -9,7 +9,7 @@
       "l5": "Decision Outcome Verification",
       "metric_field": "decision_coverage",
       "direct": false,
-      "formula": "covered_branches / max(num_branches, 1)"
+      "formula": "percent_branches_covered"
     },
     {
       "l2": "Control Flow Testing",
@@ -63,7 +63,7 @@
       "l5": "Boolean Accuracy Check",
       "metric_field": "boolean_accuracy",
       "direct": false,
-      "formula": "covered_branches / max(num_branches, 1)"
+      "formula": "percent_branches_covered"
     },
     {
       "l2": "Control Flow Testing",
@@ -71,8 +71,8 @@
       "l4": "Control Flow Validation",
       "l5": "Sequence Integrity Mapping",
       "metric_field": "control_flow_integrity",
-      "direct": false,
-      "formula": "covered_branches - missing_branches"
+      "direct": true,
+      "formula": "percent_branches_covered"
     },
     {
       "l2": "Control Flow Testing",
@@ -81,7 +81,7 @@
       "l5": "Iteration Boundary Verification",
       "metric_field": "loop_boundary_risk",
       "direct": true,
-      "formula": "missing_branches"
+      "formula": "percent_branches_covered"
     },
     {
       "l2": "Control Flow Testing",
@@ -90,7 +90,7 @@
       "l5": "Boundary Failure Identification",
       "metric_field": "edge_case_risk",
       "direct": false,
-      "formula": "missing_branches / max(num_branches, 1)"
+      "formula": "max(0, 100 - (missing_branches / max(num_branches, 1)) * 50)"
     },
     {
       "l2": "Control Flow Testing",

@@ -1,0 +1,25 @@
+name: Coverage 100 Percent
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify-100:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run 100% training pipeline
+        run: |
+          python -m coverage erase
+          python -m coverage run --branch -m pytest sample_subject/tests/test_flow_demo.py
+          python -m coverage json -o coverage.json
+          python scripts/export_platform_bundle.py
+          python scripts/verify_100_percent.py --metrics-json coveragepy_metrics.json --dashboard-json dashboard_metrics.json

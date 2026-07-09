@@ -13,13 +13,19 @@ cd python-tool-testing-coverage-py
 
 Expected final line: **`SUCCESS: All metrics are 100/100 PASS`**
 
-## Files to submit to the Testable platform
+## Files the Testable platform reads (repository ROOT)
+
+The platform scans the **GitHub repo root** when you connect the repository URL. Use these committed files:
 
 | File | Purpose |
 |------|---------|
-| `artifacts/training/coverage.json` | coverage.py raw input (100% statement + branch) |
-| `artifacts/training/metrics.json` | Full metric payload with 0-100 scores |
-| `artifacts/training/dashboard.json` | Platform-ready L4 classification scores |
+| `platform_metrics.json` | **Primary** — L4 classification → integer score `100` |
+| `metrics.json` | Same scores as `platform_metrics.json` (alias for platform scanners) |
+| `coverage.json` | coverage.py raw input + `platform_scores` + enriched `totals` (100% scale) |
+| `coveragepy_metrics.json` | Full metrics payload |
+| `dashboard_metrics.json` | PASS/FAIL per classification |
+
+Same copies also live under `platform/` and `artifacts/training/`.
 
 **Do NOT submit** an empty `coverage.json` from Downloads or a manual export with `num_statements=0`. That causes **1/100 FAIL** on branch metrics.
 
@@ -37,21 +43,23 @@ Not `1.0` (ratio). A ratio of `1.0` displays as **1/100 FAIL**.
 
 | Dashboard classification | JSON field | Expected value |
 |--------------------------|------------|----------------|
-| Conditional Logic Testing | `boolean_accuracy` | `100.0` |
-| Control Flow Validation | `control_flow_integrity` | `100.0` |
-| Loop Condition Testing | `loop_boundary_risk` | `100.0` |
-| Edge Case Detection | `edge_case_risk` | `100.0` |
-| Decision Outcome Verification | `branch_coverage_percent` | `100.0` |
+| Conditional Logic Testing | `boolean_accuracy` | `100` (integer, not 1.0) |
+| Control Flow Validation | `control_flow_integrity` | `100` |
+| Loop Condition Testing | `loop_boundary_risk` | `100` |
+| Edge Case Detection | `edge_case_risk` | `100` |
+| Decision Outcome Verification | `branch_coverage_percent` | `100` |
 | Logic Error Detection | `branch_misdirection_score` | `100.0` |
 | Test Case Completeness | `decision_gap_score` | `100.0` |
 
-## Re-generate artifacts
+## Re-generate root platform files
 
 ```powershell
 .\run_coveragepy_analysis.ps1
+# or
+.\run_tests.ps1
 ```
 
-This runs `sample_subject/` tests (16 tests, 100% coverage) and refreshes `artifacts/training/`.
+Both refresh root `coverage.json`, `platform_metrics.json`, and verify 100/100.
 
 ## Real-world mode (not 100%)
 

@@ -41,6 +41,8 @@ if ($Target -eq "sample") {
     Copy-Item "$PSScriptRoot\reports\sample_metrics.json" "$Artifacts\metrics.json" -Force
     Copy-Item "$PSScriptRoot\reports\sample_dashboard.json" "$Artifacts\dashboard.json" -Force
 
+    python "$PSScriptRoot\scripts\export_platform_bundle.py"
+
     python "$PSScriptRoot\validate_technique_coverage.py" `
         --coverage-json "$SubjectDir\coverage.json" `
         --baseline-json "$SubjectDir\coverage_baseline.json" `

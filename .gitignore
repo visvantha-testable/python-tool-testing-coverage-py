@@ -1,16 +1,20 @@
 __pycache__/
 *.py[cod]
 .coverage
-coverage.json
-coverage_baseline.json
 .pytest_cache/
 .work/
 work/
 reports/
-!artifacts/
-!artifacts/training/
-!artifacts/training/**
 *.egg-info/
 .venv/
 venv/
 .env
+
+# Ignore generated coverage JSON except committed platform/training bundles.
+**/coverage.json
+!coverage.json
+!coverage_baseline.json
+!artifacts/training/coverage.json
+!artifacts/training/coverage_baseline.json
+!platform/coverage.json
+!platform/coverage_baseline.json

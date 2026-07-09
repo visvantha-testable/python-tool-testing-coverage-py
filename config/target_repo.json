@@ -13,7 +13,7 @@
         {
           "l4": "Decision Coverage",
           "l5": "Decision Outcome Verification",
-          "formula": "decision_coverage = covered_branches / max(num_branches, 1)"
+          "formula": "decision_coverage = percent_branches_covered"
         }
       ]
     },
@@ -30,10 +30,10 @@
     {
       "l3_technique": "Branch Coverage",
       "metrics": [
-        {"l4": "Conditional Logic Testing", "l5": "Boolean Accuracy Check", "formula": "boolean_accuracy = covered_branches / max(num_branches, 1)"},
-        {"l4": "Control Flow Validation", "l5": "Sequence Integrity Mapping", "formula": "control_flow_integrity = covered_branches - missing_branches"},
-        {"l4": "Loop Condition Testing", "l5": "Iteration Boundary Verification", "formula": "loop_boundary_risk = missing_branches"},
-        {"l4": "Edge Case Detection", "l5": "Boundary Failure Identification", "formula": "edge_case_risk = missing_branches / max(num_branches, 1)"},
+        {"l4": "Conditional Logic Testing", "l5": "Boolean Accuracy Check", "formula": "boolean_accuracy = percent_branches_covered"},
+        {"l4": "Control Flow Validation", "l5": "Sequence Integrity Mapping", "formula": "control_flow_integrity = percent_branches_covered"},
+        {"l4": "Loop Condition Testing", "l5": "Iteration Boundary Verification", "formula": "loop_boundary_risk = percent_branches_covered"},
+        {"l4": "Edge Case Detection", "l5": "Boundary Failure Identification", "formula": "edge_case_risk = max(0, 100 - (missing_branches / max(num_branches, 1)) * 50)"},
         {"l4": "Logic Error Detection", "l5": "Branch Misdirection Discovery", "formula": "branch_misdirection = missing_branches"},
         {"l4": "Test Case Completeness", "l5": "Decision Coverage Gap Analysis", "formula": "decision_gap = missing_branches / max(num_branches, 1)"},
         {"l4": "Decision Outcome Verification", "l5": "Branch Coverage %", "formula": "branch_coverage_percent = percent_branches_covered"}
