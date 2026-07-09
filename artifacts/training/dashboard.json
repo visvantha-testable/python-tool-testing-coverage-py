@@ -1,0 +1,169 @@
+{
+  "tool": "coverage.py",
+  "target_repository": "sample_subject",
+  "scores": {
+    "Decision Coverage": 100.0,
+    "Unit Testing Support": 100.0,
+    "Dead Code Detection": 100.0,
+    "Test Completeness Evaluation": 100.0,
+    "Basic Logic Validation": 100.0,
+    "Code Execution Verification": 100.0,
+    "Conditional Logic Testing": 100.0,
+    "Control Flow Validation": 100.0,
+    "Loop Condition Testing": 100.0,
+    "Edge Case Detection": 100.0,
+    "Logic Error Detection": 100.0,
+    "Test Case Completeness": 100.0,
+    "Decision Outcome Verification": 100.0,
+    "Path Execution Tracking": 100.0,
+    "Complete Coverage Path Verification": 100.0,
+    "Partial Path Coverage Detection": 100.0,
+    "Nested Condition Path Testing": 100.0,
+    "Loop Path Detection": 100.0,
+    "Unreachable Path Detection": 100.0,
+    "Exception Path Handling": 100.0,
+    "Multi-Function Path Tracking": 100.0,
+    "CI/CD Integration Test": 100.0,
+    "Path Detection Testing": 100.0
+  },
+  "metrics": [
+    {
+      "classification": "Decision Coverage",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Unit Testing Support",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Dead Code Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Test Completeness Evaluation",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Basic Logic Validation",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Code Execution Verification",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Conditional Logic Testing",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Control Flow Validation",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Loop Condition Testing",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Edge Case Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Logic Error Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Test Case Completeness",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Decision Outcome Verification",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Path Execution Tracking",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Complete Coverage Path Verification",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Partial Path Coverage Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Nested Condition Path Testing",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Loop Path Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Unreachable Path Detection",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Exception Path Handling",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Multi-Function Path Tracking",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "CI/CD Integration Test",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    },
+    {
+      "classification": "Path Detection Testing",
+      "value": "100/100",
+      "result": "PASS",
+      "coverage_percent": 100.0
+    }
+  ]
+}

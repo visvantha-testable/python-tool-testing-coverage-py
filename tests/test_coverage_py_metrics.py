@@ -54,7 +54,10 @@ def test_compute_metrics_from_fixture(tmp_path):
     assert metrics.statement_coverage_percent == pytest.approx(85.0)
     assert metrics.branch_coverage_percent == pytest.approx(70.0)
     assert metrics.dead_code == 15
-    assert metrics.decision_coverage == pytest.approx(0.7)
+    assert metrics.decision_coverage == pytest.approx(70.0)
+    assert metrics.boolean_accuracy == pytest.approx(70.0)
+    assert metrics.control_flow_integrity == pytest.approx(70.0)
+    assert metrics.loop_boundary_risk == pytest.approx(70.0)
     assert metrics.path_coverage_percent == pytest.approx(77.5)
     assert metrics.path_execution_proxy == 99
     assert metrics.quality_gate_pass is False

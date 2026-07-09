@@ -31,7 +31,15 @@ if ($Target -eq "sample") {
         --baseline-json "$SubjectDir\coverage_baseline.json" `
         --source "$SourceDir" `
         --repo-url $RepoUrl `
-        --output-json "$PSScriptRoot\reports\sample_metrics.json"
+        --output-json "$PSScriptRoot\reports\sample_metrics.json" `
+        --dashboard-json "$PSScriptRoot\reports\sample_dashboard.json"
+
+    $Artifacts = Join-Path $PSScriptRoot "artifacts\training"
+    New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
+    Copy-Item "$SubjectDir\coverage.json" "$Artifacts\coverage.json" -Force
+    Copy-Item "$SubjectDir\coverage_baseline.json" "$Artifacts\coverage_baseline.json" -Force
+    Copy-Item "$PSScriptRoot\reports\sample_metrics.json" "$Artifacts\metrics.json" -Force
+    Copy-Item "$PSScriptRoot\reports\sample_dashboard.json" "$Artifacts\dashboard.json" -Force
 
     python "$PSScriptRoot\validate_technique_coverage.py" `
         --coverage-json "$SubjectDir\coverage.json" `

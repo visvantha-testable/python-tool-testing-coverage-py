@@ -36,6 +36,15 @@ python -m pytest tests/ -q
 
 Uses bundled `sample_subject/` (100% statement + branch coverage) so all dashboard metrics score **100/100**.
 
+### Testing team certification
+
+See **[TESTING_TEAM.md](TESTING_TEAM.md)** — submit files from `artifacts/training/` after:
+
+```powershell
+.\run_coveragepy_analysis.ps1
+.\verify_100_percent.ps1
+```
+
 ### Full pipeline (real-world coveragepy analysis)
 
 ```powershell

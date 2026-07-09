@@ -44,6 +44,16 @@ def test_sample_subject_100_percent_coverage(sample_coverage_files):
     assert metrics.missing_branches == 0
 
 
+def test_branch_metrics_emit_0_to_100_scale(sample_coverage_files):
+    cov_path, source = sample_coverage_files
+    metrics = compute_metrics(cov_path, source_root=source)
+    assert metrics.boolean_accuracy == pytest.approx(100.0)
+    assert metrics.control_flow_integrity == pytest.approx(100.0)
+    assert metrics.loop_boundary_risk == pytest.approx(100.0)
+    assert metrics.branch_coverage_percent == pytest.approx(100.0)
+    assert metrics.decision_coverage == pytest.approx(100.0)
+
+
 def test_normalized_scores_all_pass(sample_coverage_files):
     cov_path, source = sample_coverage_files
     metrics = compute_metrics(cov_path, source_root=source)

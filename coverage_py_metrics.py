@@ -23,17 +23,21 @@ class CoveragePyMetrics:
     # Statement coverage
     granularity_proxy: float
     dead_code: int
+    dead_code_score: float
     coverage_gap: float
+    coverage_gap_score: float
     basic_validation: float
     statement_coverage_percent: float
 
-    # Branch coverage
+    # Branch coverage (all percentage fields use 0-100 scale for platform ingestion)
     boolean_accuracy: float
-    control_flow_integrity: int
-    loop_boundary_risk: int
+    control_flow_integrity: float
+    loop_boundary_risk: float
     edge_case_risk: float
     branch_misdirection: int
+    branch_misdirection_score: float
     decision_gap: float
+    decision_gap_score: float
     branch_coverage_percent: float
 
     # Path coverage
@@ -41,12 +45,14 @@ class CoveragePyMetrics:
     full_logic_validation: bool
     full_path_coverage_proxy: float
     partial_path_gaps: int
+    partial_path_gaps_score: float
     nested_logic_risk: int
-    loop_path_risk: int
+    loop_path_risk: float
     nested_condition_paths: int
     loop_paths: int
     unreachable_paths: int
-    error_path_risk: int
+    unreachable_paths_score: float
+    error_path_risk: float
     exception_paths: int
     cross_function_coverage: int
     multi_function_paths: int
@@ -79,17 +85,8 @@ def compute_normalized_scores(metrics: CoveragePyMetrics) -> dict[str, float]:
     """Map raw metrics to 0-100 dashboard scores per Excel normalisation formulas."""
     stmt = metrics.statement_coverage_percent
     branch = metrics.branch_coverage_percent
-    dead_code_pct = (metrics.dead_code / max(metrics.num_statements, 1)) * 100.0
-    coverage_gap_pct = metrics.coverage_gap * 100.0
-    decision_gap_pct = metrics.decision_gap * 100.0
-    edge_case_pct = metrics.edge_case_risk * 100.0
-    path_gap_pct = (
-        metrics.partial_path_gaps / max(metrics.num_statements + metrics.num_branches, 1)
-    ) * 100.0
-    boolean_pct = metrics.boolean_accuracy * 100.0
-    nested_pct = (
-        (metrics.num_branches - metrics.nested_logic_risk) / max(metrics.num_branches, 1)
-    ) * 100.0
+    boolean_pct = metrics.boolean_accuracy
+    granularity_pct = min(100.0, stmt)
     path_exec_pct = min(
         100.0,
         (metrics.path_execution_proxy / max(metrics.num_statements + metrics.num_branches, 1))
@@ -99,32 +96,53 @@ def compute_normalized_scores(metrics: CoveragePyMetrics) -> dict[str, float]:
         100.0,
         (metrics.cross_function_coverage / max(metrics.num_statements, 1)) * 100.0,
     )
-    granularity_pct = min(100.0, stmt)
+    nested_pct = (
+        (metrics.num_branches - metrics.nested_logic_risk) / max(metrics.num_branches, 1)
+    ) * 100.0
 
     return {
         "Decision Coverage": branch,
         "Unit Testing Support": granularity_pct,
-        "Dead Code Detection": max(0.0, 100.0 - dead_code_pct * 25.0),
-        "Test Completeness Evaluation": max(0.0, 100.0 - coverage_gap_pct),
+        "Dead Code Detection": metrics.dead_code_score,
+        "Test Completeness Evaluation": metrics.coverage_gap_score,
         "Basic Logic Validation": stmt,
         "Code Execution Verification": stmt,
         "Conditional Logic Testing": boolean_pct,
-        "Control Flow Validation": boolean_pct,
-        "Loop Condition Testing": branch,
-        "Edge Case Detection": max(0.0, 100.0 - edge_case_pct * 50.0),
-        "Logic Error Detection": max(0.0, 100.0 - metrics.branch_misdirection * 20.0),
-        "Test Case Completeness": max(0.0, 100.0 - decision_gap_pct),
+        "Control Flow Validation": metrics.control_flow_integrity,
+        "Loop Condition Testing": metrics.loop_boundary_risk,
+        "Edge Case Detection": metrics.edge_case_risk,
+        "Logic Error Detection": metrics.branch_misdirection_score,
+        "Test Case Completeness": metrics.decision_gap_score,
         "Decision Outcome Verification": branch,
         "Path Execution Tracking": path_exec_pct,
         "Complete Coverage Path Verification": metrics.full_path_coverage_proxy,
-        "Partial Path Coverage Detection": max(0.0, 100.0 - path_gap_pct),
+        "Partial Path Coverage Detection": metrics.partial_path_gaps_score,
         "Nested Condition Path Testing": nested_pct,
-        "Loop Path Detection": branch,
-        "Unreachable Path Detection": max(0.0, 100.0 - path_gap_pct * 25.0),
-        "Exception Path Handling": branch,
+        "Loop Path Detection": metrics.loop_path_risk,
+        "Unreachable Path Detection": metrics.unreachable_paths_score,
+        "Exception Path Handling": metrics.error_path_risk,
         "Multi-Function Path Tracking": cross_function_pct,
         "CI/CD Integration Test": min(100.0, metrics.automation_readiness / 2.0),
         "Path Detection Testing": metrics.path_coverage_percent,
+    }
+
+
+def export_dashboard_payload(metrics: CoveragePyMetrics) -> dict:
+    """Platform-ready export: L4 classification -> score out of 100."""
+    scores = compute_normalized_scores(metrics)
+    return {
+        "tool": "coverage.py",
+        "target_repository": "sample_subject",
+        "scores": scores,
+        "metrics": [
+            {
+                "classification": name,
+                "value": f"{round(score)}/100",
+                "result": "PASS" if score >= 80.0 else "FAIL",
+                "coverage_percent": round(score, 2),
+            }
+            for name, score in scores.items()
+        ],
     }
 
 
@@ -212,30 +230,46 @@ def compute_metrics(
         percent_covered >= quality_threshold and percent_branches >= quality_threshold
     )
 
+    branch_ratio = covered_branches / max(num_branches, 1)
+    branch_pct = percent_branches
+    coverage_gap_ratio = missing_lines / max(num_statements, 1)
+    decision_gap_ratio = missing_branches / max(num_branches, 1)
+    edge_case_ratio = missing_branches / max(num_branches, 1)
+    path_gap_ratio = (
+        (missing_lines + missing_branches) / max(num_statements + num_branches, 1)
+    )
+    dead_code_pct = (missing_lines / max(num_statements, 1)) * 100.0
+
     return CoveragePyMetrics(
-        decision_coverage=covered_branches / max(num_branches, 1),
+        decision_coverage=branch_pct,
         granularity_proxy=num_statements / file_count,
         dead_code=missing_lines,
-        coverage_gap=missing_lines / max(num_statements, 1),
+        dead_code_score=max(0.0, 100.0 - dead_code_pct * 25.0),
+        coverage_gap=coverage_gap_ratio,
+        coverage_gap_score=max(0.0, 100.0 - coverage_gap_ratio * 100.0),
         basic_validation=percent_covered,
         statement_coverage_percent=percent_covered,
-        boolean_accuracy=covered_branches / max(num_branches, 1),
-        control_flow_integrity=covered_branches - missing_branches,
-        loop_boundary_risk=missing_branches,
-        edge_case_risk=missing_branches / max(num_branches, 1),
+        boolean_accuracy=branch_pct,
+        control_flow_integrity=branch_pct,
+        loop_boundary_risk=branch_pct,
+        edge_case_risk=max(0.0, 100.0 - edge_case_ratio * 50.0),
         branch_misdirection=missing_branches,
-        decision_gap=missing_branches / max(num_branches, 1),
-        branch_coverage_percent=percent_branches,
+        branch_misdirection_score=max(0.0, 100.0 - missing_branches * 20.0),
+        decision_gap=decision_gap_ratio,
+        decision_gap_score=max(0.0, 100.0 - decision_gap_ratio * 100.0),
+        branch_coverage_percent=branch_pct,
         path_execution_proxy=current["covered_lines"] + covered_branches,
         full_logic_validation=percent_covered >= 90.0 and percent_branches >= 90.0,
         full_path_coverage_proxy=percent_covered * percent_branches / 100.0,
         partial_path_gaps=missing_lines + missing_branches,
+        partial_path_gaps_score=max(0.0, 100.0 - path_gap_ratio * 100.0),
         nested_logic_risk=num_branches - covered_branches,
-        loop_path_risk=missing_branches,
+        loop_path_risk=branch_pct,
         nested_condition_paths=decision_points,
         loop_paths=loop_nodes,
         unreachable_paths=missing_lines + missing_branches,
-        error_path_risk=missing_branches,
+        unreachable_paths_score=max(0.0, 100.0 - path_gap_ratio * 25.0),
+        error_path_risk=branch_pct,
         exception_paths=try_except_nodes,
         cross_function_coverage=current["cross_function_coverage"],
         multi_function_paths=file_count,
@@ -271,22 +305,22 @@ def _print_report(metrics: CoveragePyMetrics, repo_url: str | None) -> None:
 
     sections = [
         ("Cyclomatic Complexity", [
-            ("Decision Outcome Verification", f"{metrics.decision_coverage:.2%}"),
+            ("Decision Outcome Verification", f"{metrics.decision_coverage:.2f}%"),
         ]),
         ("Statement Coverage", [
             ("Test Case Granularity (proxy)", f"{metrics.granularity_proxy:.2f}"),
             ("Unreachable Logic (dead code lines)", metrics.dead_code),
-            ("Coverage Gap Analysis", f"{metrics.coverage_gap:.2%}"),
+            ("Coverage Gap Analysis", f"{metrics.coverage_gap_score:.2f}/100"),
             ("Surface-Level Correctness", f"{metrics.basic_validation:.2f}%"),
             ("Statement Coverage %", f"{metrics.statement_coverage_percent:.2f}%"),
         ]),
         ("Branch Coverage", [
-            ("Boolean Accuracy Check", f"{metrics.boolean_accuracy:.2%}"),
-            ("Sequence Integrity Mapping", metrics.control_flow_integrity),
-            ("Iteration Boundary Verification (missing branches)", metrics.loop_boundary_risk),
-            ("Boundary Failure Identification", f"{metrics.edge_case_risk:.2%}"),
-            ("Branch Misdirection Discovery", metrics.branch_misdirection),
-            ("Decision Coverage Gap Analysis", f"{metrics.decision_gap:.2%}"),
+            ("Boolean Accuracy Check", f"{metrics.boolean_accuracy:.2f}%"),
+            ("Sequence Integrity Mapping", f"{metrics.control_flow_integrity:.2f}%"),
+            ("Iteration Boundary Verification", f"{metrics.loop_boundary_risk:.2f}%"),
+            ("Boundary Failure Identification", f"{metrics.edge_case_risk:.2f}/100"),
+            ("Branch Misdirection Discovery (raw count)", metrics.branch_misdirection),
+            ("Decision Coverage Gap Analysis", f"{metrics.decision_gap_score:.2f}/100"),
             ("Branch Coverage %", f"{metrics.branch_coverage_percent:.2f}%"),
         ]),
         ("Path Coverage", [
@@ -353,6 +387,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--quality-threshold", type=float, default=80.0)
     parser.add_argument("--repo-url", default=None)
     parser.add_argument("--output-json", type=pathlib.Path, default=None)
+    parser.add_argument("--dashboard-json", type=pathlib.Path, default=None)
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     if not args.coverage_json.is_file():
@@ -371,8 +406,17 @@ def main(argv: Iterable[str] | None = None) -> int:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
         payload = asdict(metrics)
         payload["normalized_scores"] = compute_normalized_scores(metrics)
+        payload["dashboard_export"] = export_dashboard_payload(metrics)
         args.output_json.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         print(f"Wrote {args.output_json}")
+
+    if args.dashboard_json:
+        args.dashboard_json.parent.mkdir(parents=True, exist_ok=True)
+        args.dashboard_json.write_text(
+            json.dumps(export_dashboard_payload(metrics), indent=2),
+            encoding="utf-8",
+        )
+        print(f"Wrote {args.dashboard_json}")
 
     return 0
 

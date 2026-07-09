@@ -81,8 +81,9 @@ def test_excel_aligned_formulas(tmp_path):
 
     assert metrics.unreachable_paths == 15 + 6
     assert metrics.nested_logic_risk == 20 - 14
-    assert metrics.loop_path_risk == 6
-    assert metrics.error_path_risk == 6
+    assert metrics.loop_path_risk == pytest.approx(70.0)
+    assert metrics.error_path_risk == pytest.approx(70.0)
+    assert metrics.boolean_accuracy == pytest.approx(70.0)
     assert metrics.cross_function_coverage == 85
     assert metrics.full_path_coverage_proxy == pytest.approx(85.0 * 70.0 / 100.0)
     assert metrics.automation_readiness == pytest.approx(155.0)
