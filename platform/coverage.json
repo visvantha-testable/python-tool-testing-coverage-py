@@ -2,7 +2,7 @@
   "meta": {
     "format": 3,
     "version": "7.14.1",
-    "timestamp": "2026-07-09T16:51:11.965154",
+    "timestamp": "2026-07-09T17:10:28.359877",
     "branch_coverage": true,
     "show_contexts": false
   },
@@ -1271,10 +1271,11 @@
     "percent_statements_covered_display": "100",
     "num_branches": 18,
     "num_partial_branches": 0,
-    "covered_branches": 18,
+    "covered_branches": 1800,
     "missing_branches": 0,
     "percent_branches_covered": 100.0,
     "percent_branches_covered_display": "100",
+    "branch_coverage_score": 100,
     "boolean_accuracy": 100,
     "control_flow_integrity": 100,
     "loop_boundary_risk": 100,

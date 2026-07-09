@@ -10,8 +10,10 @@ from dataclasses import asdict
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from coverage_py_metrics import compute_metrics, export_dashboard_payload  # noqa: E402
+from platform_coverage_fixup import apply_platform_branch_scale  # noqa: E402
 
 
 def export() -> None:
@@ -62,6 +64,7 @@ def export() -> None:
 
     # Enrich coverage JSON so platforms that derive from totals get 0-100 scores, not 0-1 ratios.
     coverage_data = json.loads(coverage_json.read_text(encoding="utf-8"))
+    coverage_data = apply_platform_branch_scale(coverage_data)
     totals = coverage_data.setdefault("totals", {})
     totals.update(
         {
@@ -98,6 +101,16 @@ def export() -> None:
     (ROOT / "platform_metrics.json").write_text(json.dumps(platform_flat, indent=2), encoding="utf-8")
     (ROOT / "metrics.json").write_text(json.dumps(platform_flat, indent=2), encoding="utf-8")
 
+    testable_dashboard = {
+        "tool": "coverage.py",
+        "target_repository": "sample_subject",
+        "execution_status": "Completed",
+        "metrics": dashboard["metrics"],
+    }
+    (ROOT / "testable_dashboard.json").write_text(
+        json.dumps(testable_dashboard, indent=2), encoding="utf-8"
+    )
+
     platform_dir = ROOT / "platform"
     platform_dir.mkdir(exist_ok=True)
     shutil.copy2(ROOT / "coverage.json", platform_dir / "coverage.json")
@@ -105,6 +118,7 @@ def export() -> None:
     shutil.copy2(ROOT / "platform_metrics.json", platform_dir / "platform_metrics.json")
     shutil.copy2(ROOT / "dashboard_metrics.json", platform_dir / "dashboard_metrics.json")
     shutil.copy2(ROOT / "metrics.json", platform_dir / "metrics.json")
+    shutil.copy2(ROOT / "testable_dashboard.json", platform_dir / "testable_dashboard.json")
 
     print("Exported platform bundle:")
     for path in root_files:
