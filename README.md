@@ -57,7 +57,32 @@ python coverage_py_metrics.py `
   --baseline-json work/coveragepy/coverage_baseline.json
 ```
 
-## Project Layout
+See `config/target_repo.json` for machine-readable mapping and formulas.
+See `config/execution_trigger.json` for exact commands and expected output.
+
+## Execution (trigger data)
+
+| Input | Value |
+|-------|-------|
+| **Subject repo** | `https://github.com/nedbat/coveragepy` |
+| **Source root (AST proxy)** | `work/coveragepy/coverage` |
+| **coverage.py JSON** | `work/coveragepy/coverage.json` (after `coverage run --branch`) |
+| **One-shot script** | `.\run_coveragepy_analysis.ps1` |
+
+Expected metrics after running against coveragepy (`tests/test_coverage.py`, 72 tests):
+
+| Metric | Expected value |
+|--------|----------------|
+| Statement Coverage % | 55.02% |
+| Branch Coverage % | 19.57% |
+| Path Coverage % (proxy) | 37.29% |
+| Decision Coverage | 19.57% |
+| Dead code lines | 302 |
+| Path execution proxy | 460 |
+| AST decision points | 1057 |
+| AST loop nodes | 257 |
+| Statements / covered / missing | 744 / 442 / 302 |
+| Branches / covered / missing | 92 / 18 / 74 |
 
 ```
 python-tool-testing-coverage-py/

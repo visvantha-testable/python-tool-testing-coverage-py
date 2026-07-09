@@ -1,0 +1,93 @@
+{
+  "metric_groups": [
+    "Cyclomatic Complexity (Decision Coverage)",
+    "Statement Coverage",
+    "Branch Coverage",
+    "Path Coverage",
+    "Coverage Delta"
+  ],
+  "tool": "coverage.py",
+  "target_repository": {
+    "name": "coveragepy",
+    "url": "https://github.com/nedbat/coveragepy",
+    "source_path": "work/coveragepy/coverage",
+    "why": "Official coverage.py codebase with pytest suite; running coverage on its own tests produces statement, branch, and path-proxy metrics natively"
+  },
+  "trigger_sequence": [
+    {
+      "step": 1,
+      "tool": "pip",
+      "command": "python -m pip install -r requirements.txt",
+      "purpose": "Install coverage.py, pytest, hypothesis"
+    },
+    {
+      "step": 2,
+      "tool": "git",
+      "command": "git clone --depth 1 https://github.com/nedbat/coveragepy.git work/coveragepy",
+      "purpose": "Clone subject repository"
+    },
+    {
+      "step": 3,
+      "tool": "coverage.py",
+      "command": "cd work/coveragepy && set PYTHONPATH=. && python -m coverage run --branch -m pytest tests/test_coverage.py -o addopts= -q",
+      "purpose": "Execute tests with branch coverage enabled"
+    },
+    {
+      "step": 4,
+      "tool": "coverage.py",
+      "command": "cd work/coveragepy && python -m coverage json -o coverage.json",
+      "purpose": "Emit coverage JSON (required raw data)"
+    },
+    {
+      "step": 5,
+      "tool": "coverage_py_metrics.py",
+      "command": "python coverage_py_metrics.py --coverage-json work/coveragepy/coverage.json --source work/coveragepy/coverage --repo-url https://github.com/nedbat/coveragepy --output-json reports/coveragepy_metrics.json",
+      "purpose": "Derive all 28 sub-metrics from coverage JSON"
+    }
+  ],
+  "one_shot_script": ".\\run_coveragepy_analysis.ps1",
+  "required_coverage_json_fields": [
+    "totals.percent_covered",
+    "totals.percent_branches_covered",
+    "totals.num_statements",
+    "totals.covered_lines",
+    "totals.missing_lines",
+    "totals.num_branches",
+    "totals.covered_branches",
+    "totals.missing_branches",
+    "files"
+  ],
+  "expected_sample_output": {
+    "statement_coverage_percent": 55.02,
+    "branch_coverage_percent": 19.57,
+    "path_coverage_percent": 37.29,
+    "decision_coverage": 0.1957,
+    "dead_code": 302,
+    "coverage_gap": 0.4059,
+    "path_execution_proxy": 460,
+    "nested_condition_paths": 1057,
+    "loop_paths": 257,
+    "exception_paths": 71,
+    "num_statements": 744,
+    "covered_lines": 442,
+    "missing_lines": 302,
+    "num_branches": 92,
+    "covered_branches": 18,
+    "missing_branches": 74,
+    "file_count": 8,
+    "quality_gate_pass": false
+  },
+  "thresholds_from_mapping": {
+    "statement_coverage_percent": ">= 80%",
+    "branch_coverage_percent": ">= 80%",
+    "path_coverage_percent": ">= 80%"
+  },
+  "direct_emission_metrics": [
+    "statement_coverage_percent (percent_covered)",
+    "branch_coverage_percent (percent_branches_covered)",
+    "dead_code (missing_lines)",
+    "basic_validation (percent_covered)",
+    "loop_boundary_risk (missing_branches)",
+    "branch_misdirection (missing_branches)"
+  ]
+}
