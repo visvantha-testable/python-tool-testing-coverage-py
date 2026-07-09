@@ -31,13 +31,17 @@ Same copies also live under `platform/` and `artifacts/training/`.
 
 ## Why branch metrics showed 1/100 before
 
-The platform reads fields like `boolean_accuracy` as **0-100 scores**. When coverage is 100% we must emit:
+The Testable platform computes branch scores as:
 
-```json
-"boolean_accuracy": 100.0
+```
+covered_branches / num_branches
 ```
 
-Not `1.0` (ratio). A ratio of `1.0` displays as **1/100 FAIL**.
+At **100% branch coverage**, coverage.py reports `18/18 = 1.0`. The platform displays that as **1/100 FAIL** (it does not multiply by 100).
+
+Gap/count metrics (Logic Error Detection, Test Case Completeness) still passed because `missing_branches = 0`.
+
+**Fix:** `scripts/platform_coverage_fixup.py` scales root `coverage.json` so `covered_branches = 100 × num_branches` (e.g. `1800/18 = 100`).
 
 ## Branch metrics mapping
 
