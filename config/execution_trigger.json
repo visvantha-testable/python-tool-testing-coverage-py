@@ -13,6 +13,16 @@
     "source_path": "work/coveragepy/coverage",
     "why": "Official coverage.py codebase with pytest suite; running coverage on its own tests produces statement, branch, and path-proxy metrics natively"
   },
+  "alternate_target_repositories": [
+    {
+      "name": "pytest-cov",
+      "url": "https://github.com/pytest-dev/pytest-cov",
+      "source_path": "subject_repos/pytest-cov/src/pytest_cov",
+      "bundled_path": "subject_repos/pytest-cov",
+      "why": "Official pytest-cov plugin; Excel mapping lists pytest-cov --cov-branch as coverage.py trigger",
+      "one_shot_command": ".\\run_coveragepy_analysis.ps1 -Target pytest-cov"
+    }
+  ],
   "trigger_sequence": [
     {
       "step": 1,

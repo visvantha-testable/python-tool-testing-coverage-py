@@ -1,0 +1,14 @@
+[paths]
+source =
+    ../example
+    */site-packages/example
+
+[run]
+branch = true
+source =
+    example
+    .
+
+[report]
+precision = 2
+show_missing = true

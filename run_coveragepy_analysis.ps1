@@ -1,8 +1,9 @@
 param(
-    [ValidateSet("sample", "coveragepy")]
+    [ValidateSet("sample", "coveragepy", "pytest-cov")]
     [string]$Target = "sample",
     [string]$WorkDir = "$PSScriptRoot\work",
-    [string]$CoveragePyUrl = "https://github.com/nedbat/coveragepy.git"
+    [string]$CoveragePyUrl = "https://github.com/nedbat/coveragepy.git",
+    [string]$PytestCovDir = "$PSScriptRoot\subject_repos\pytest-cov"
 )
 
 $ErrorActionPreference = "Stop"
@@ -47,6 +48,41 @@ if ($Target -eq "sample") {
         --coverage-json "$SubjectDir\coverage.json" `
         --baseline-json "$SubjectDir\coverage_baseline.json" `
         --source "$SourceDir"
+
+    exit $LASTEXITCODE
+}
+
+if ($Target -eq "pytest-cov") {
+    if (-not (Test-Path $PytestCovDir)) {
+        throw "pytest-cov source not found at $PytestCovDir. Clone https://github.com/pytest-dev/pytest-cov into subject_repos/pytest-cov"
+    }
+
+    python -m pip install -r "$PSScriptRoot\requirements.txt" -q
+    python -m pip install -e $PytestCovDir -q
+
+    Push-Location $PytestCovDir
+
+    python -m coverage erase
+    python -m pytest --cov=pytest_cov --cov-branch tests/test_pytest_cov.py -q
+    python -m coverage json -o coverage_baseline.json
+
+    python -m coverage erase
+    python -m pytest --cov=pytest_cov --cov-branch tests/ -q
+    python -m coverage json -o coverage.json
+
+    Pop-Location
+
+    python "$PSScriptRoot\coverage_py_metrics.py" `
+        --coverage-json "$PytestCovDir\coverage.json" `
+        --baseline-json "$PytestCovDir\coverage_baseline.json" `
+        --source "$PytestCovDir\src\pytest_cov" `
+        --repo-url "https://github.com/pytest-dev/pytest-cov" `
+        --output-json "$PSScriptRoot\reports\pytest_cov_metrics.json"
+
+    python "$PSScriptRoot\validate_technique_coverage.py" `
+        --coverage-json "$PytestCovDir\coverage.json" `
+        --baseline-json "$PytestCovDir\coverage_baseline.json" `
+        --source "$PytestCovDir\src\pytest_cov"
 
     exit $LASTEXITCODE
 }

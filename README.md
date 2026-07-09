@@ -16,6 +16,7 @@ Covers the metric groups shown in the strategy mapping:
 |-------|-------|
 | **Subject repo (100% training)** | `sample_subject/` (bundled — 100% coverage) |
 | **Subject repo (real-world)** | [nedbat/coveragepy](https://github.com/nedbat/coveragepy) |
+| **Subject repo (pytest-cov)** | [pytest-dev/pytest-cov](https://github.com/pytest-dev/pytest-cov) (bundled in `subject_repos/pytest-cov/`) |
 | **Tool** | coverage.py (Primary) |
 | **Secondary tools** | pytest-cov, mccabe, AST path proxy |
 
@@ -50,6 +51,14 @@ See **[TESTING_TEAM.md](TESTING_TEAM.md)** — submit files from `artifacts/trai
 ```powershell
 .\run_coveragepy_analysis.ps1 -Target coveragepy
 ```
+
+### Full pipeline (pytest-cov subject — Excel trigger: `pytest-cov --cov-branch`)
+
+```powershell
+.\run_coveragepy_analysis.ps1 -Target pytest-cov
+```
+
+Uses bundled source at `subject_repos/pytest-cov/` (cloned from [pytest-dev/pytest-cov](https://github.com/pytest-dev/pytest-cov)).
 
 ### Manual run
 
@@ -118,6 +127,8 @@ python-tool-testing-coverage-py/
 ├── sample_subject/                # 100% coverage training app + tests
 │   ├── app/flow_demo.py
 │   └── tests/
+├── subject_repos/
+│   └── pytest-cov/                # Vendored pytest-dev/pytest-cov source
 ├── validate_technique_coverage.py # Verifies all 29 techniques are covered
 ├── config/
 │   ├── target_repo.json           # Strategy/metric/tool mapping
