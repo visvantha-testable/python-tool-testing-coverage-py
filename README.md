@@ -57,6 +57,17 @@ python coverage_py_metrics.py `
   --baseline-json work/coveragepy/coverage_baseline.json
 ```
 
+### Validate all techniques are covered
+
+```powershell
+python validate_technique_coverage.py `
+  --coverage-json work/coveragepy/coverage.json `
+  --baseline-json work/coveragepy/coverage_baseline.json `
+  --source work/coveragepy/coverage
+```
+
+See `config/technique_coverage.json` for the full mapping of all 29 Excel techniques to metric fields.
+
 See `config/target_repo.json` for machine-readable mapping and formulas.
 See `config/execution_trigger.json` for exact commands and expected output.
 
@@ -87,7 +98,11 @@ Expected metrics after running against coveragepy (`tests/test_coverage.py`, 72 
 ```
 python-tool-testing-coverage-py/
 ├── coverage_py_metrics.py         # Metric extractor from coverage JSON
-├── config/target_repo.json        # Strategy/metric/tool mapping
+├── validate_technique_coverage.py # Verifies all 29 techniques are covered
+├── config/
+│   ├── target_repo.json           # Strategy/metric/tool mapping
+│   ├── technique_coverage.json    # Excel technique → metric field map
+│   └── execution_trigger.json     # Exact commands + expected output
 ├── run_coveragepy_analysis.ps1    # End-to-end coveragepy pipeline
 ├── requirements.txt
 └── tests/

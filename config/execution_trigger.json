@@ -29,20 +29,32 @@
     {
       "step": 3,
       "tool": "coverage.py",
-      "command": "cd work/coveragepy && set PYTHONPATH=. && python -m coverage run --branch -m pytest tests/test_coverage.py -o addopts= -q",
-      "purpose": "Execute tests with branch coverage enabled"
+      "command": "cd work/coveragepy && set PYTHONPATH=. && python -m coverage erase && python -m coverage run --branch -m pytest tests/test_version.py -o addopts= -q && python -m coverage json -o coverage_baseline.json",
+      "purpose": "Baseline run for Coverage Delta metrics"
     },
     {
       "step": 4,
       "tool": "coverage.py",
-      "command": "cd work/coveragepy && python -m coverage json -o coverage.json",
-      "purpose": "Emit coverage JSON (required raw data)"
+      "command": "cd work/coveragepy && set PYTHONPATH=. && python -m coverage erase && python -m coverage run --branch -m pytest tests/test_coverage.py -o addopts= -q",
+      "purpose": "Current run with branch coverage enabled"
     },
     {
       "step": 5,
+      "tool": "coverage.py",
+      "command": "cd work/coveragepy && python -m coverage json -o coverage.json",
+      "purpose": "Emit current coverage JSON (required raw data)"
+    },
+    {
+      "step": 6,
       "tool": "coverage_py_metrics.py",
-      "command": "python coverage_py_metrics.py --coverage-json work/coveragepy/coverage.json --source work/coveragepy/coverage --repo-url https://github.com/nedbat/coveragepy --output-json reports/coveragepy_metrics.json",
-      "purpose": "Derive all 28 sub-metrics from coverage JSON"
+      "command": "python coverage_py_metrics.py --coverage-json work/coveragepy/coverage.json --baseline-json work/coveragepy/coverage_baseline.json --source work/coveragepy/coverage --repo-url https://github.com/nedbat/coveragepy --output-json reports/coveragepy_metrics.json",
+      "purpose": "Derive all 29 sub-metrics from coverage JSON"
+    },
+    {
+      "step": 7,
+      "tool": "validate_technique_coverage.py",
+      "command": "python validate_technique_coverage.py --coverage-json work/coveragepy/coverage.json --baseline-json work/coveragepy/coverage_baseline.json --source work/coveragepy/coverage",
+      "purpose": "Verify all techniques are covered"
     }
   ],
   "one_shot_script": ".\\run_coveragepy_analysis.ps1",

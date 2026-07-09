@@ -39,12 +39,18 @@ class CoveragePyMetrics:
     # Path coverage
     path_execution_proxy: int
     full_logic_validation: bool
+    full_path_coverage_proxy: float
     partial_path_gaps: int
+    nested_logic_risk: int
+    loop_path_risk: int
     nested_condition_paths: int
     loop_paths: int
     unreachable_paths: int
+    error_path_risk: int
     exception_paths: int
+    cross_function_coverage: int
     multi_function_paths: int
+    automation_readiness: float
     quality_gate_pass: bool
     path_coverage_percent: float
 
@@ -73,6 +79,12 @@ def _load_totals(path: pathlib.Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     totals = data.get("totals", {})
     files = data.get("files", {})
+    cross_function_coverage = 0
+    for file_data in files.values():
+        summary = file_data.get("summary", {})
+        cross_function_coverage += int(summary.get("covered_lines", 0))
+    if cross_function_coverage == 0:
+        cross_function_coverage = int(totals.get("covered_lines", 0))
     return {
         "percent_covered": float(totals.get("percent_covered", 0.0)),
         "percent_branches_covered": float(totals.get("percent_branches_covered", 0.0)),
@@ -83,6 +95,7 @@ def _load_totals(path: pathlib.Path) -> dict:
         "covered_branches": int(totals.get("covered_branches", 0)),
         "missing_branches": int(totals.get("missing_branches", 0)),
         "file_count": len(files),
+        "cross_function_coverage": cross_function_coverage,
     }
 
 
@@ -142,6 +155,10 @@ def compute_metrics(
         quality_improvement = (coverage_delta + branch_delta) / 2
         impact = abs(coverage_delta) / max(baseline["percent_covered"], 0.01)
 
+    quality_gate_pass = (
+        percent_covered >= quality_threshold and percent_branches >= quality_threshold
+    )
+
     return CoveragePyMetrics(
         decision_coverage=covered_branches / max(num_branches, 1),
         granularity_proxy=num_statements / file_count,
@@ -158,13 +175,19 @@ def compute_metrics(
         branch_coverage_percent=percent_branches,
         path_execution_proxy=current["covered_lines"] + covered_branches,
         full_logic_validation=percent_covered >= 90.0 and percent_branches >= 90.0,
+        full_path_coverage_proxy=percent_covered * percent_branches / 100.0,
         partial_path_gaps=missing_lines + missing_branches,
+        nested_logic_risk=num_branches - covered_branches,
+        loop_path_risk=missing_branches,
         nested_condition_paths=decision_points,
         loop_paths=loop_nodes,
-        unreachable_paths=missing_lines,
+        unreachable_paths=missing_lines + missing_branches,
+        error_path_risk=missing_branches,
         exception_paths=try_except_nodes,
+        cross_function_coverage=current["cross_function_coverage"],
         multi_function_paths=file_count,
-        quality_gate_pass=percent_covered >= quality_threshold,
+        automation_readiness=percent_covered + percent_branches,
+        quality_gate_pass=quality_gate_pass,
         path_coverage_percent=(percent_covered + percent_branches) / 2,
         coverage_delta_percent=coverage_delta,
         discovery_power=discovery_power,
@@ -216,12 +239,18 @@ def _print_report(metrics: CoveragePyMetrics, repo_url: str | None) -> None:
         ("Path Coverage", [
             ("Path Execution Proxy", metrics.path_execution_proxy),
             ("Full Logic Validation (>=90%)", metrics.full_logic_validation),
+            ("Full Path Coverage Proxy", f"{metrics.full_path_coverage_proxy:.2f}%"),
             ("Gap Identification", metrics.partial_path_gaps),
+            ("Deep Logic Probing (nested logic risk)", metrics.nested_logic_risk),
             ("Deep Logic Probing (AST decisions)", metrics.nested_condition_paths),
+            ("Iterative Route Analysis (loop path risk)", metrics.loop_path_risk),
             ("Iterative Route Analysis (AST loops)", metrics.loop_paths),
             ("Ghost Code Discovery", metrics.unreachable_paths),
-            ("Error Flow Verification (try/except)", metrics.exception_paths),
+            ("Error Flow Verification (error path risk)", metrics.error_path_risk),
+            ("Error Flow Verification (try/except AST)", metrics.exception_paths),
+            ("Cross-Component Mapping (covered lines)", metrics.cross_function_coverage),
             ("Cross-Component Mapping (files)", metrics.multi_function_paths),
+            ("Automated Quality Readiness", f"{metrics.automation_readiness:.2f}%"),
             ("Automated Quality Gate", metrics.quality_gate_pass),
             ("Path Coverage % (proxy)", f"{metrics.path_coverage_percent:.2f}%"),
         ]),

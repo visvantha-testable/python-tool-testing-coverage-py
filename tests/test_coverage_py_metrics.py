@@ -57,7 +57,7 @@ def test_compute_metrics_from_fixture(tmp_path):
     assert metrics.decision_coverage == pytest.approx(0.7)
     assert metrics.path_coverage_percent == pytest.approx(77.5)
     assert metrics.path_execution_proxy == 99
-    assert metrics.quality_gate_pass is True
+    assert metrics.quality_gate_pass is False
 
 
 def test_coverage_delta_with_baseline(tmp_path):
