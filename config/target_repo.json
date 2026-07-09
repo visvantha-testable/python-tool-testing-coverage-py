@@ -1,0 +1,69 @@
+{
+  "tool": "coverage.py",
+  "recommended_repository": {
+    "name": "coveragepy",
+    "url": "https://github.com/nedbat/coveragepy",
+    "clone_url": "https://github.com/nedbat/coveragepy.git",
+    "rationale": "Official coverage.py project with a large pytest suite. It exercises statement, branch, path-proxy, and coverage-delta metrics natively and is the canonical codebase for validating Coverage.py as primary tool."
+  },
+  "metric_groups": [
+    {
+      "l3_technique": "Cyclomatic Complexity",
+      "metrics": [
+        {
+          "l4": "Decision Coverage",
+          "l5": "Decision Outcome Verification",
+          "formula": "decision_coverage = covered_branches / max(num_branches, 1)"
+        }
+      ]
+    },
+    {
+      "l3_technique": "Statement Coverage",
+      "metrics": [
+        {"l4": "Unit Testing Support", "l5": "Test Case Granularity", "formula": "granularity_proxy = num_statements / max(file_count, 1)"},
+        {"l4": "Dead Code Detection", "l5": "Unreachable Logic Identification", "formula": "dead_code = missing_lines"},
+        {"l4": "Test Completeness Evaluation", "l5": "Coverage Gap Analysis", "formula": "coverage_gap = missing_lines / max(num_statements, 1)"},
+        {"l4": "Basic Logic Validation", "l5": "Surface-Level Correctness", "formula": "basic_validation = percent_covered"},
+        {"l4": "Code Execution Verification", "l5": "Statement Coverage %", "formula": "statement_coverage_percent = percent_covered"}
+      ]
+    },
+    {
+      "l3_technique": "Branch Coverage",
+      "metrics": [
+        {"l4": "Conditional Logic Testing", "l5": "Boolean Accuracy Check", "formula": "boolean_accuracy = covered_branches / max(num_branches, 1)"},
+        {"l4": "Control Flow Validation", "l5": "Sequence Integrity Mapping", "formula": "control_flow_integrity = covered_branches - missing_branches"},
+        {"l4": "Loop Condition Testing", "l5": "Iteration Boundary Verification", "formula": "loop_boundary_risk = missing_branches"},
+        {"l4": "Edge Case Detection", "l5": "Boundary Failure Identification", "formula": "edge_case_risk = missing_branches / max(num_branches, 1)"},
+        {"l4": "Logic Error Detection", "l5": "Branch Misdirection Discovery", "formula": "branch_misdirection = missing_branches"},
+        {"l4": "Test Case Completeness", "l5": "Decision Coverage Gap Analysis", "formula": "decision_gap = missing_branches / max(num_branches, 1)"},
+        {"l4": "Decision Outcome Verification", "l5": "Branch Coverage %", "formula": "branch_coverage_percent = percent_branches_covered"}
+      ]
+    },
+    {
+      "l3_technique": "Path Coverage",
+      "metrics": [
+        {"l4": "Path Execution Tracking", "l5": "Path Execution Proxy", "formula": "path_execution_proxy = covered_lines + covered_branches"},
+        {"l4": "Complete Coverage Path Verification", "l5": "Full Logic Validation", "formula": "full_logic_validation = percent_covered >= 0.9 and percent_branches_covered >= 0.9"},
+        {"l4": "Partial Path Coverage Detection", "l5": "Gap Identification", "formula": "partial_path_gaps = missing_lines + missing_branches"},
+        {"l4": "Nested Condition Path Testing", "l5": "Deep Logic Probing", "formula": "nested_condition_paths = ast_decision_points"},
+        {"l4": "Loop Path Detection", "l5": "Iterative Route Analysis", "formula": "loop_paths = ast_loop_nodes"},
+        {"l4": "Unreachable Path Detection", "l5": "Ghost Code Discovery", "formula": "unreachable_paths = missing_lines"},
+        {"l4": "Exception Path Handling", "l5": "Error Flow Verification", "formula": "exception_paths = ast_try_except_nodes"},
+        {"l4": "Multi-Function Path Tracking", "l5": "Cross-Component Mapping", "formula": "multi_function_paths = file_count"},
+        {"l4": "CI/CD Integration Test", "l5": "Automated Quality Enforcement", "formula": "quality_gate = percent_covered >= threshold"},
+        {"l4": "Path Detection Testing", "l5": "Path Coverage %", "formula": "path_coverage_percent = (percent_covered + percent_branches_covered) / 2"}
+      ]
+    },
+    {
+      "l3_technique": "Coverage Delta",
+      "metrics": [
+        {"l4": "Regression Testing Monitoring", "l5": "Coverage Delta %", "formula": "coverage_delta_percent = current.percent_covered - previous.percent_covered"},
+        {"l4": "Test Suite Effectiveness Tracking", "l5": "Discovery Power Assessment", "formula": "discovery_power = previous.missing_lines - current.missing_lines"},
+        {"l4": "CI/CD Quality Gate Enforcement", "l5": "Deployment Readiness Guard", "formula": "quality_gate_pass = current.percent_covered >= threshold"},
+        {"l4": "Change Impact Analysis", "l5": "Ripple Effect Mapping", "formula": "impact_ratio = abs(coverage_delta_percent) / max(previous.percent_covered, 0.01)"},
+        {"l4": "New Code Testing Validation", "l5": "Fresh Logic Proofing", "formula": "new_code_coverage = current.covered_lines - previous.covered_lines"},
+        {"l4": "Quality Improvement Measurement", "l5": "Structural Health Benchmarking", "formula": "quality_improvement = (coverage_delta_percent + branch_delta_percent) / 2"}
+      ]
+    }
+  ]
+}

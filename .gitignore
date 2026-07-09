@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.coverage
+coverage.json
+coverage_baseline.json
+.pytest_cache/
+work/
+reports/
+*.egg-info/
+.venv/
+venv/
+.env
