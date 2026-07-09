@@ -75,6 +75,59 @@ class CoveragePyMetrics:
     ast_try_except_nodes: int
 
 
+def compute_normalized_scores(metrics: CoveragePyMetrics) -> dict[str, float]:
+    """Map raw metrics to 0-100 dashboard scores per Excel normalisation formulas."""
+    stmt = metrics.statement_coverage_percent
+    branch = metrics.branch_coverage_percent
+    dead_code_pct = (metrics.dead_code / max(metrics.num_statements, 1)) * 100.0
+    coverage_gap_pct = metrics.coverage_gap * 100.0
+    decision_gap_pct = metrics.decision_gap * 100.0
+    edge_case_pct = metrics.edge_case_risk * 100.0
+    path_gap_pct = (
+        metrics.partial_path_gaps / max(metrics.num_statements + metrics.num_branches, 1)
+    ) * 100.0
+    boolean_pct = metrics.boolean_accuracy * 100.0
+    nested_pct = (
+        (metrics.num_branches - metrics.nested_logic_risk) / max(metrics.num_branches, 1)
+    ) * 100.0
+    path_exec_pct = min(
+        100.0,
+        (metrics.path_execution_proxy / max(metrics.num_statements + metrics.num_branches, 1))
+        * 100.0,
+    )
+    cross_function_pct = min(
+        100.0,
+        (metrics.cross_function_coverage / max(metrics.num_statements, 1)) * 100.0,
+    )
+    granularity_pct = min(100.0, stmt)
+
+    return {
+        "Decision Coverage": branch,
+        "Unit Testing Support": granularity_pct,
+        "Dead Code Detection": max(0.0, 100.0 - dead_code_pct * 25.0),
+        "Test Completeness Evaluation": max(0.0, 100.0 - coverage_gap_pct),
+        "Basic Logic Validation": stmt,
+        "Code Execution Verification": stmt,
+        "Conditional Logic Testing": boolean_pct,
+        "Control Flow Validation": boolean_pct,
+        "Loop Condition Testing": branch,
+        "Edge Case Detection": max(0.0, 100.0 - edge_case_pct * 50.0),
+        "Logic Error Detection": max(0.0, 100.0 - metrics.branch_misdirection * 20.0),
+        "Test Case Completeness": max(0.0, 100.0 - decision_gap_pct),
+        "Decision Outcome Verification": branch,
+        "Path Execution Tracking": path_exec_pct,
+        "Complete Coverage Path Verification": metrics.full_path_coverage_proxy,
+        "Partial Path Coverage Detection": max(0.0, 100.0 - path_gap_pct),
+        "Nested Condition Path Testing": nested_pct,
+        "Loop Path Detection": branch,
+        "Unreachable Path Detection": max(0.0, 100.0 - path_gap_pct * 25.0),
+        "Exception Path Handling": branch,
+        "Multi-Function Path Tracking": cross_function_pct,
+        "CI/CD Integration Test": min(100.0, metrics.automation_readiness / 2.0),
+        "Path Detection Testing": metrics.path_coverage_percent,
+    }
+
+
 def _load_totals(path: pathlib.Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     totals = data.get("totals", {})
@@ -283,6 +336,14 @@ def _print_report(metrics: CoveragePyMetrics, repo_url: str | None) -> None:
     print(f"  statements={metrics.num_statements} covered={metrics.covered_lines} missing={metrics.missing_lines}")
     print(f"  branches={metrics.num_branches} covered={metrics.covered_branches} missing={metrics.missing_branches}")
 
+    scores = compute_normalized_scores(metrics)
+    print()
+    print("Normalized Dashboard Scores (0-100)")
+    print("---------------------------------")
+    for name, score in scores.items():
+        status = "PASS" if score >= 80.0 else ("WARN" if score >= 60.0 else "FAIL")
+        print(f"  {name:<42} {score:6.2f}/100  {status}")
+
 
 def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -308,7 +369,9 @@ def main(argv: Iterable[str] | None = None) -> int:
 
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
-        args.output_json.write_text(json.dumps(asdict(metrics), indent=2), encoding="utf-8")
+        payload = asdict(metrics)
+        payload["normalized_scores"] = compute_normalized_scores(metrics)
+        args.output_json.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         print(f"Wrote {args.output_json}")
 
     return 0

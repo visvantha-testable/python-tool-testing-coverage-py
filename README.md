@@ -14,7 +14,8 @@ Covers the metric groups shown in the strategy mapping:
 
 | Field | Value |
 |-------|-------|
-| **Repository** | [nedbat/coveragepy](https://github.com/nedbat/coveragepy) |
+| **Subject repo (100% training)** | `sample_subject/` (bundled — 100% coverage) |
+| **Subject repo (real-world)** | [nedbat/coveragepy](https://github.com/nedbat/coveragepy) |
 | **Tool** | coverage.py (Primary) |
 | **Secondary tools** | pytest-cov, mccabe, AST path proxy |
 
@@ -27,10 +28,18 @@ python -m pip install -r requirements.txt
 python -m pytest tests/ -q
 ```
 
-### Full pipeline (analyze coveragepy)
+### Full pipeline (100% training — recommended)
 
 ```powershell
 .\run_coveragepy_analysis.ps1
+```
+
+Uses bundled `sample_subject/` (100% statement + branch coverage) so all dashboard metrics score **100/100**.
+
+### Full pipeline (real-world coveragepy analysis)
+
+```powershell
+.\run_coveragepy_analysis.ps1 -Target coveragepy
 ```
 
 ### Manual run
@@ -97,7 +106,9 @@ Expected metrics after running against coveragepy (`tests/test_coverage.py`, 72 
 
 ```
 python-tool-testing-coverage-py/
-├── coverage_py_metrics.py         # Metric extractor from coverage JSON
+├── sample_subject/                # 100% coverage training app + tests
+│   ├── app/flow_demo.py
+│   └── tests/
 ├── validate_technique_coverage.py # Verifies all 29 techniques are covered
 ├── config/
 │   ├── target_repo.json           # Strategy/metric/tool mapping
